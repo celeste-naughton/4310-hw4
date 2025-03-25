@@ -16,7 +16,7 @@
                 <button id="metacritic" value="metacritic">Metacritic</button>
                 <button id="release_date" value="release_date">Release Date</button>
             </div>
-            <svg width="600" height="700"></svg>
+            <svg width="800" height="700"></svg>
         </div>
 
         <div >
@@ -47,7 +47,7 @@
         const width = svg.attr("width");
         const height = svg.attr("height");
         const sidebar = d3.select("#sidebar")
-        const margin = { top: 10, right: 100, bottom: 40, left: 125 };
+        const margin = { top: 10, right: 120, bottom: 40, left: 125 };
 
     
 
@@ -103,7 +103,7 @@
         };
 
 
-       //ChatGPT
+       //Helped create with ChatGPT -> needed a quick way to remove NA values.
         function replaceNAWithZero(data) {
                 return data.map(item => {
                     // Iterate through each key in the object
