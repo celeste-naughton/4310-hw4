@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization</title>
+    <link rel="stylesheet" type="text/css" href="styles/site.css">
+</head>
+<body>
+    <div>
+
+    </div>
+
+    <div class="container row">
+        <div class="column">
+            <div class="row">
+                <button id="rotten_tomatoes" value="rotten_tomatoes">Rottent Tomatoes Rating</button>
+                <button id="critics_choice" value="critics_choice">Critics Choice</button>
+                <button id="metacritic" value="metacritic">Metacritic</button>
+                <button id="release_date" value="release_date">Release Date</button>
+            </div>
+            <svg width="600" height="700"></svg>
+        </div>
+
+        <aside class="sidebar" id="sidebar">
+            <p> Hover over a point to learn more information</p>
+
+        </aside>
+
+    </div>
+
+
+    <div class="tooltip" style="visibility: hidden;"></div>
+
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script>
+        
+        const svg = d3.select("svg");
+        const width = svg.attr("width");
+        const height = svg.attr("height");
+        const sidebar = d3.select("#sidebar")
+        const margin = { top: 10, right: 20, bottom: 40, left: 110 };
+
+    
+
+        let filmDictionary = {
+            "Toy Story": "A cowboy doll feels threatened when a new spaceman toy arrives.",
+            "Toy Story 2": "Woody is stolen by a toy collector, and Buzz leads a rescue mission.",
+            "Finding Nemo": "A clownfish searches for his son, who was captured by divers.",
+            "Up": "An elderly man and a young boy embark on an adventure in a floating house.",
+            "Toy Story 3": "The toys face an uncertain future when Andy leaves for college.",
+            "Inside Out": "A young girl's emotions navigate her life during a big move.",
+            "The Incredibles": "A family of superheroes comes out of retirement to save the world.",
+            "Coco": "A boy travels to the Land of the Dead to uncover his family's history.",
+            "Toy Story 4": "Woody and the gang meet a new toy, Forky, on a road trip.",
+            "Monsters, Inc.": "Monsters generate energy by scaring kids, but a child enters their world.",
+            "Ratatouille": "A rat dreams of becoming a chef in a prestigious Parisian restaurant.",
+            "Soul": "A musician's soul gets separated from his body before his big break.",
+            "WALL-E": "A lonely robot cleans up Earth and discovers love and adventure in space.",
+            "Finding Dory": "Dory searches for her long-lost family with the help of her friends.",
+            "Incredibles 2": "The superhero family balances saving the world with family life.",
+            "A Bug's Life": "An ant recruits a group of misfit bugs to save his colony from grasshoppers.",
+            "Onward": "Two brothers go on a magical quest to bring back their late father.",
+            "Monsters University": "Mike and Sulley meet in college and learn to work together.",
+            "Brave": "A princess defies tradition and seeks to change her fate.",
+            "The Good Dinosaur": "A dinosaur and a human boy form an unlikely friendship.",
+            "Cars": "A race car learns the value of friendship in a small town.",
+            "Cars 2":"Lightning McQueen and Mater travel overseas for a World Grand Prix, but Mater gets caught up in international espionage.",
+            "Cars 3": "Lightning McQueen faces a new generation of racers and seeks a comeback."
+        };
+        let filmImages = {
+            "Toy Story": "toy-story.jpg",
+            "Toy Story 2": "toy-story-2.jpg",
+            "Finding Nemo": "finding-nemo.jpg",
+            "Up": "up.jpg",
+            "Toy Story 3": "toy-story-3.jpg",
+            "Inside Out": "inside-out.jpg",
+            "The Incredibles": "the-incredibles.jpg",
+            "Coco": "coco.jpg",
+            "Toy Story 4": "toy-story-4.jpg",
+            "Monsters, Inc.": "monsters-inc.jpg",
+            "Ratatouille": "ratatouille.jpg",
+            "Soul": "soul.jpg",
+            "WALL-E": "wall-e.jpg",
+            "Finding Dory": "finding-dory.jpg",
+            "Incredibles 2": "incredibles-2.jpg",
+            "A Bug's Life": "a-bugs-life.jpg",
+            "Onward": "onward.jpg",
+            "Monsters University": "monsters-university.jpg",
+            "Brave": "brave.jpg",
+            "The Good Dinosaur": "the-good-dinosaur.jpg",
+            "Cars": "cars.jpg",
+            "Cars 2": "cars-2.jpg",
+            "Cars 3": "cars-3.jpg"
+        };
+
+
+       //ChatGPT
+        function replaceNAWithZero(data) {
+                return data.map(item => {
+                    // Iterate through each key in the object
+                    Object.keys(item).forEach(key => {
+                        if (item[key] === 'NA'  ) {
+                            item[key] = '0'; // Replace 'NA' with '0'
+                        }
+                    });
+                    return item; // Return the modified object
+                });
+            }
+
+
+        // Add your data loading and chart rendering code here
+
+        const requestFilms = async function() {
+
+            
+            const films1 = await d3.csv("pixar_films.csv");
+            const ratings1 = await d3.csv("public_response.csv")
+
+            const films = replaceNAWithZero(films1);
+            const ratings = replaceNAWithZero(ratings1);
+
+            var attribute = "rotten_tomatoes";
+
+            const combindedData = films.map(film => {    
+                const rating = ratings.find(r => r.film === film.film); // Match by title
+                return {
+                    film: film.film,
+                    release_date: new Date(film.release_date).getFullYear(),
+                    run_time: Number(film.run_time),
+                    film_rating: film.film_rating,
+                    rotten_tomatoes: rating ? Number(rating["rotten_tomatoes"]) : 0, // Handle undefined rating
+                    metacritic: rating ? Number(rating.metacritic) : 0,             // Handle undefined rating
+                    critics_choice: rating ? Number(rating["critics_choice"]) : 0, // Handle undefined rating
+                    cinema_score: rating ? rating["cinema_score"] : "0" 
+                };
+                });
+
+        
+            const data =  d3.sort(
+                    combindedData.filter( d => 
+                    d[attribute] !== "NA" && // Ensure the selected attribute is not "NA"
+                    d.film !== "Turning Red" &&
+                    d.film !== "NA" &&
+                    d.film !== "Lightyear" &&
+                    d.film !== "Luca" &&
+                    d.film !== "0"
+
+                ),
+                (a, b) => b[attribute] - a[attribute]
+            )
+    
+            console.log("data: ", data);
+            const xExtent = d3.extent(data, d => d[attribute]); 
+            const xScale = d3.scaleLinear().domain([0,100]).range([margin.left, width - margin.right]);
+
+
+            const yExtent = data.map(d => d.film);
+            const yScale = d3.scaleBand().domain(yExtent).range([margin.top + 10 , height - margin.bottom]).padding(0.1);
+
+
+            const runTimeExtent = d3.extent(data, d => d["run_time"]);
+            const runTimeScale = d3.scaleLinear().domain(runTimeExtent).range([5,12]);
+
+            const yearExtent = d3.extent(data, d => d.release_date);
+            const colorScale =d3.scaleSequential()
+                                .domain(yearExtent)
+                                .interpolator(d3.interpolateRgb("white", "red"));
+
+            console.log("Color for min year:", colorScale(yearExtent[0]));
+            console.log("Color for max year:", colorScale(yearExtent[1]));
+
+            console.log(runTimeExtent);
+            console.log("yscale: ", yScale)
+            
+            //Y Axis
+            let yAxis = d3.axisLeft(yScale);   
+            let yGridlines = d3.axisLeft(yScale)
+                            .tickSize(-width+margin.left)
+                            .tickFormat('');
+                      
+
+            svg.append("g")
+                .attr("class", "y axis")
+                .attr("transform",`translate(${margin.left - 10}, ${margin.top})`) 
+                .call(yAxis)                                                
+    
+                        
+            let xAxis = d3.axisBottom(xScale);
+            let xGridlines = d3.axisBottom(xScale)
+                           .tickSize(-height+margin.bottom)
+                           .tickSizeOuter(0)
+                           .tickFormat('');
+
+
+
+            svg.append("g")
+                .attr("class", "x_gridlines")
+                .attr("transform",`translate(0,${height - margin.top - 10})`) 
+                .attr("stroke-dasharray", "4 1")
+                .attr("color","white")
+                .attr("opacity", 0.5)
+                .call(xGridlines) 
+
+            svg.append("g")
+                 .attr("class", "x axis")
+                .attr("transform",`translate(0,${height - margin.top - 10})`) 
+                .call(xAxis) 
+
+
+            
+            let lines = svg.selectAll("line.cirle_lines").data(data)
+                            .join("line")
+                            .attr("class", "circle_lines")
+                            .attr("x1", margin.left) // Start at the circle's x position
+                            .attr("y1", d => yScale(d.film) + yScale.bandwidth() -2.5) // Start at the circle's y position
+                            .attr("x2", d => xScale(d[attribute])) // End at the same x position (vertical line)
+                            .attr("y2", d => yScale(d.film) + yScale.bandwidth() -2.5) // End at the x-axis
+                            .attr("stroke", "white") // Line color
+                            .attr("stroke-width", 3); // Line thickness
+                            
+
+            let circles = svg.selectAll("circle.point").data(data)
+                                .join("circle")
+                                .attr("class", "point")
+                                .attr("class", d => d.film)
+                                .attr("label", d => d.film)
+                                .attr("opacity", 0.9)
+                                .attr("cx", d => xScale(d[attribute]))
+                                .attr("cy", d => yScale(d['film']) + yScale.bandwidth() - 2.5) 
+                                .attr("r", d => runTimeScale(d.run_time))
+                                .attr("fill", d => colorScale(d.release_date) ); 
+
+            circles.on("mouseover", function(event, d) {
+                d3.select(this)
+                .transition().duration(200)
+                .attr("stroke","black")
+                .attr("stroke-width", 2)
+                
+
+                d3.select("#label").text(d['title']);
+
+                sidebar.html(`
+                    <img class="centered-image" src="public/images/${filmImages[d.film]}" width="200" height="300"/>
+                    <h2> ${d.film}</h2>
+                    <p>${filmDictionary[d.film]}</p> 
+                    <p>Cinema Score: ${d.cinema_score} </p>
+                    <div class="row space_btw">
+                        <div class="column rating">
+                            <img src="public/images/rotten-tomatoes.png" width="50" height="50">
+                            <p>Rotten Tomatoes: ${d.rotten_tomatoes} </p>
+                        </div>
+
+                        <div class="column rating">
+                            <img src="public/images/critics-choice.png" width="50" height="50">
+                           <p> Critics Choice: ${d.critics_choice} </p>
+                        </div>
+
+                        <div class="column rating">
+                            <img src="public/images/metacritic.png" width="50" height="50">
+                           <p> Metacritic: ${d.metacritic} </p>
+                        </div>
+
+                    </div>
+                    
+                    <p class="left"> Release Date: ${d.release_date} </p>
+                        `);
+
+            });
+
+            circles.on("mouseout", function(event, d) {
+                d3.select(this)
+                .transition().duration(200)
+                .attr("stroke","black")
+                .attr("stroke-width", 0);
+                });
+
+         function updateScales(attribute) {
+
+                const sortedData = d3.sort(data, (a, b) => b[attribute] - a[attribute]);
+
+                // Update the yScale domain based on the sorted data
+                yScale.domain(sortedData.map(d => d.film));
+
+                // Redraw the x-axis
+                svg.select(".x.axis")
+                    .transition()
+                    .duration(1000) // Smooth transition
+                    .call(d3.axisBottom(xScale))
+ 
+                // Redraw the y-axis
+                svg.select(".y.axis")
+                    .transition()
+                    .duration(1000) // Smooth transition
+                    .call(d3.axisLeft(yScale));
+
+                // Update the positions of the circles
+                svg.selectAll("circle")
+                    .transition()
+                    .duration(1000) // Smooth transition
+                    .attr("cx", d => xScale(d[attribute]))
+                    .attr("cy", d => yScale(d['film']) + yScale.bandwidth() - 2.5);
+
+                
+                svg.selectAll("line")
+                    .transition()
+                    .duration(1000) // Smooth transition
+                    .attr("y1", d => yScale(d.film) + yScale.bandwidth() -2.5) // Start at the circle's y position
+                    .attr("x2", d => xScale(d[attribute])) // End at the same x position (vertical line)
+                    .attr("y2", d => yScale(d.film) + yScale.bandwidth() -2.5)     
+                    
+            }
+
+
+            // Add event listeners for each button
+            d3.select("#rotten_tomatoes").on("click", function () {
+
+                updateScales("rotten_tomatoes");
+
+                svg.append("g")
+                .attr("class", "x_gridlines")
+                .attr("transform",`translate(0,${height - margin.top - 10})`) 
+                .attr("stroke-dasharray", "4 1")
+                .attr("color","white")
+                .attr("opacity", 0.5)
+                .call(xGridlines) 
+            });
+
+            d3.select("#metacritic").on("click", function () {
+                updateScales("metacritic");
+
+                svg.append("g")
+                    .attr("class", "x_gridlines")
+                    .attr("transform",`translate(0,${height - margin.top - 10})`) 
+                    .attr("stroke-dasharray", "4 1")
+                    .attr("color","white")
+                    .attr("opacity", 0.5)
+                    .call(xGridlines) 
+
+            });
+
+            d3.select("#critics_choice").on("click", function () {
+
+                updateScales("critics_choice");
+
+                svg.append("g")
+                .attr("class", "x_gridlines")
+                .attr("transform",`translate(0,${height - margin.top - 10})`) 
+                .attr("stroke-dasharray", "4 1")
+                .attr("color", "white")
+                .attr("opacity", 0.5)
+                .call(xGridlines) 
+                
+    
+            });
+
+            d3.select("#release_date").on("click", function () {
+                
+                const sortedData = d3.sort(data, (a, b) => b['release_date'] - a['release_date']);
+                // Update the yScale domain based on the sorted data
+                yScale.domain(sortedData.map(d => d.film));
+
+                // Redraw the x-axis
+                svg.select(".x.axis")
+                    .transition()
+                    .duration(1000) // Smooth transition
+                    .call(d3.axisBottom(xScale));
+
+                // Redraw the y-axis
+                svg.select(".y.axis")
+                    .transition()
+                    .duration(1000) // Smooth transition
+                    .call(d3.axisLeft(yScale));
+
+                // Update the positions of the circles
+                svg.selectAll("circle")
+                    .transition()
+                    .duration(1000) // Smooth transition
+                    .attr("cy", d => yScale(d['film']) + yScale.bandwidth() - 2.5);
+
+
+                svg.selectAll("line")
+                    .transition()
+                    .duration(1000) // Smooth transition
+                    .attr("y1", d => yScale(d.film) + yScale.bandwidth() -2.5) // Start at the circle's y position
+                     // End at the same x position (vertical line)
+                    .attr("y2", d => yScale(d.film) + yScale.bandwidth() -2.5)
+
+                svg.append("g")
+                    .attr("class", "x_gridlines")
+                    .attr("transform",`translate(0,${height - margin.top - 10})`) 
+                    .attr("stroke-dasharray", "4 1")
+                    .attr("color","white")
+                    .attr("opacity", 0.5)
+                    .call(xGridlines) 
+                   
+            });
+            
+        }
+
+
+         requestFilms();
+    </script>
+</body>
+</html>
