@@ -7,14 +7,11 @@
     <link rel="stylesheet" type="text/css" href="styles/site.css">
 </head>
 <body>
-    <div>
-
-    </div>
 
     <div class="container row">
         <div class="column">
             <div class="row">
-                <button id="rotten_tomatoes" value="rotten_tomatoes">Rottent Tomatoes Rating</button>
+                <button id="rotten_tomatoes" value="rotten_tomatoes" class="active">Rotten Tomatoes Rating</button>
                 <button id="critics_choice" value="critics_choice">Critics Choice</button>
                 <button id="metacritic" value="metacritic">Metacritic</button>
                 <button id="release_date" value="release_date">Release Date</button>
@@ -22,10 +19,21 @@
             <svg width="600" height="700"></svg>
         </div>
 
-        <aside class="sidebar" id="sidebar">
-            <p> Hover over a point to learn more information</p>
+        <div >
+            <h1>Pixar Film Ratings</h1>
+            <p class="info left">This is a visualization is built upon  one done by Jessica Moore from the TidyTuesday BlueSky
+                thread. Click on the buttons to filter by Movie critic. 
+            </p>
 
-        </aside>
+            <aside class="sidebar" id="sidebar">
+               
+                <p class="left"> By clicking on the filter buttons above, you can see the what are the best Pixar movies by each respective 
+                    movie review website.</p>
+                <p class="left">Hover over a point to learn more information about a movie and see all of the ratings.</p>
+            </aside>
+    
+        </div>
+
 
     </div>
 
@@ -39,7 +47,7 @@
         const width = svg.attr("width");
         const height = svg.attr("height");
         const sidebar = d3.select("#sidebar")
-        const margin = { top: 10, right: 20, bottom: 40, left: 110 };
+        const margin = { top: 10, right: 100, bottom: 40, left: 125 };
 
     
 
@@ -241,23 +249,23 @@
                 d3.select("#label").text(d['title']);
 
                 sidebar.html(`
-                    <img class="centered-image" src="public/images/${filmImages[d.film]}" width="200" height="300"/>
+                    <img class="centered-image movie_img" src="public/images/${filmImages[d.film]}" width="200" height="300"/>
                     <h2> ${d.film}</h2>
                     <p>${filmDictionary[d.film]}</p> 
-                    <p>Cinema Score: ${d.cinema_score} </p>
+                    <p class="left">Cinema Score: ${d.cinema_score} </p>
                     <div class="row space_btw">
                         <div class="column rating">
-                            <img src="public/images/rotten-tomatoes.png" width="50" height="50">
+                            <img src="public/images/rotten-tomatoes.png" width="60" height="60">
                             <p>Rotten Tomatoes: ${d.rotten_tomatoes} </p>
                         </div>
 
                         <div class="column rating">
-                            <img src="public/images/critics-choice.png" width="50" height="50">
+                            <img src="public/images/critics-choice.png" width="60" height="60">
                            <p> Critics Choice: ${d.critics_choice} </p>
                         </div>
 
                         <div class="column rating">
-                            <img src="public/images/metacritic.png" width="50" height="50">
+                            <img src="public/images/metacritic.png" width="60" height="60">
                            <p> Metacritic: ${d.metacritic} </p>
                         </div>
 
@@ -274,6 +282,44 @@
                 .attr("stroke","black")
                 .attr("stroke-width", 0);
                 });
+
+        // Add a legend group to the SVG
+        const legend = svg.append("g")
+                            .attr("class", "legend")
+                            .attr("transform", `translate(${width - margin.right + 20}, ${margin.top})`); 
+
+        // Define legend data (example: colors for years or categories)
+        const legendData = [
+            { label: "1995-2000", color: "white" },
+            { label: "2001-2010", color: "pink" },
+            { label: "2011-2020", color: "red" }
+        ];
+
+        // Add legend items
+        legend.selectAll("g.legend-item")   
+            .data(legendData)
+            .join("g")
+            .attr("class", "legend-item")
+            .attr("transform", (d, i) => `translate(0, ${i * 40})`) 
+            .each(function(d) {
+                
+                d3.select(this)
+                    .append("circle")
+                    .attr("cx", 10) // Circle x position
+                    .attr("cy", 10) // Circle y position
+                    .attr("r", 6) // Circle radius
+                    .attr("fill", d.color); // Circle color
+
+                // Add a label for each legend item
+                d3.select(this)
+                    .append("text")
+                    .attr("x", 25) // Text x position
+                    .attr("y", 15) // Text y position (aligned with the circle)
+                    .text(d.label) // Legend label
+                    .style("font-size", "12px")
+                    .attr("fill", "black");
+            });
+    
 
          function updateScales(attribute) {
 
@@ -307,14 +353,17 @@
                     .duration(1000) // Smooth transition
                     .attr("y1", d => yScale(d.film) + yScale.bandwidth() -2.5) // Start at the circle's y position
                     .attr("x2", d => xScale(d[attribute])) // End at the same x position (vertical line)
-                    .attr("y2", d => yScale(d.film) + yScale.bandwidth() -2.5)     
+                    .attr("y2", d => yScale(d.film) + yScale.bandwidth() -2.5)    
+                    
+                
                     
             }
 
 
             // Add event listeners for each button
             d3.select("#rotten_tomatoes").on("click", function () {
-
+                d3.selectAll("button").classed("active", false);
+                d3.select(this).classed("active", true);
                 updateScales("rotten_tomatoes");
 
                 svg.append("g")
@@ -324,9 +373,12 @@
                 .attr("color","white")
                 .attr("opacity", 0.5)
                 .call(xGridlines) 
+                
             });
 
             d3.select("#metacritic").on("click", function () {
+                d3.selectAll("button").classed("active", false);
+                d3.select(this).classed("active", true);
                 updateScales("metacritic");
 
                 svg.append("g")
@@ -340,7 +392,8 @@
             });
 
             d3.select("#critics_choice").on("click", function () {
-
+                d3.selectAll("button").classed("active", false);
+                d3.select(this).classed("active", true);
                 updateScales("critics_choice");
 
                 svg.append("g")
@@ -355,6 +408,10 @@
             });
 
             d3.select("#release_date").on("click", function () {
+                d3.selectAll("button").classed("active", false);
+
+                // Add the 'active' class to the clicked button
+                d3.select(this).classed("active", true);
                 
                 const sortedData = d3.sort(data, (a, b) => b['release_date'] - a['release_date']);
                 // Update the yScale domain based on the sorted data
@@ -396,8 +453,9 @@
                    
             });
             
+            
         }
-
+        
 
          requestFilms();
     </script>

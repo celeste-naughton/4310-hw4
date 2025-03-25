@@ -2,13 +2,20 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    /* font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; */
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
     background-color: #9ad0ff;
+    font-size: 18px;
 }
 
 .space_btw{
     justify-content: space-between;
 }
+text{
+    font-size: 12px;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
 .rating{
     margin: 15px;
     justify-content: center;
@@ -26,6 +33,9 @@ html, body {
     margin-top: 0;
     margin-left: 40px;
 }
+.info{
+    width: 620px;
+}
 
 .left{
     text-align: left;
@@ -40,11 +50,28 @@ p{
 h1{
     margin-left: 40px;
     color: white;
+    margin-bottom: 0px;
+    margin-top: 40px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; 
+
+}
+h2{
+    margin-bottom: 0px;
 }
 
 img{
     justify-content: center;
     align-items: center;
+    margin-bottom: 0;
+
+}
+
+.movie_img{
+    border: solid;
+    border-color: #8f2151;
+    border-width: 2px;
+    border-radius: 4px;
+
 }
 .container{
     margin-left: 60px;
@@ -52,23 +79,32 @@ img{
 
 aside{
     color: rgb(0, 0, 0);
-    background-color: #ffffff;
+    background-color: #fac9df;
     height: 600px;
     width: 550px;
-    margin: 100px 20px 20px 60px;
+    margin: 50px 20px 20px 60px;
     border-radius: 5px;
     margin: 10px;
     padding: 10px;
-    border-right: 1px solid;
     justify-content: center;
 }
 
 .sidebar{
     display: flex;
     flex-direction: column;
-    margin-top: 100px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4);
 }
 
+.ombre-box {
+    width: 300px; /* Set the width of the box */
+    height: 200px; /* Set the height of the box */
+    border-radius: 10px; /* Optional: Add rounded corners */
+    padding: 20px; /* Add padding inside the box */
+    color: white; /* Text color */
+    text-align: center; /* Center the text */
+    background: linear-gradient(to bottom, #ff7eb3, #ff758c, #ff6b6b); /* Ombre gradient */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Add a drop shadow */
+}
 
 .row{
     display: flex;
@@ -87,16 +123,16 @@ button {
     border: none; /* Remove border */
     border-radius: 5px; /* Rounded corners */
     padding: 5px 20px; /* Padding */
-    margin: 10px 10px 10px 10px;
+    margin: 40px 10px 10px 10px;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
     font-size: 16px; /* Font size */
     cursor: pointer; /* Pointer cursor on hover */
     transition: background-color 0.3s, transform 0.2s; /* Smooth transitions */
 }
-button{
-    margin-top: 30px;
+
+.active{
+    background-color: #8f2151;
 }
-
-
 
 
 .tooltip {
