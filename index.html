@@ -224,12 +224,12 @@
             let lines = svg.selectAll("line.cirle_lines").data(data)
                             .join("line")
                             .attr("class", "circle_lines")
-                            .attr("x1", margin.left) // Start at the circle's x position
-                            .attr("y1", d => yScale(d.film) + yScale.bandwidth() -2.5) // Start at the circle's y position
-                            .attr("x2", d => xScale(d[attribute])) // End at the same x position (vertical line)
-                            .attr("y2", d => yScale(d.film) + yScale.bandwidth() -2.5) // End at the x-axis
-                            .attr("stroke", "white") // Line color
-                            .attr("stroke-width", 3); // Line thickness
+                            .attr("x1", margin.left)
+                            .attr("y1", d => yScale(d.film) + yScale.bandwidth() -2.5) 
+                            .attr("x2", d => xScale(d[attribute])) 
+                            .attr("y2", d => yScale(d.film) + yScale.bandwidth() -2.5)
+                            .attr("stroke", "white") 
+                            .attr("stroke-width", 3); 
                             
 
             let circles = svg.selectAll("circle.point").data(data)
@@ -294,9 +294,9 @@
 
         // Define legend data 
         const legendData = [
-            { label: "1995-2000 | 80 mins", color: "white", size: 3 },
-            { label: "2001-2010 | 100 mins", color: "pink", size: 6 },
-            { label: "2011-2020 | 120 mins", color: "red", size: 9 }
+            { label: "1995-2000 | 80 mins", color: "white", size: 5 },
+            { label: "2001-2010 | 100 mins", color: "pink", size: 8 },
+            { label: "2011-2020 | 120 mins", color: "red", size: 12 }
         ];
 
         // Add legend items
@@ -358,9 +358,9 @@
                 
                 svg.selectAll("line")
                     .transition()
-                    .duration(1000) // Smooth transition
-                    .attr("y1", d => yScale(d.film) + yScale.bandwidth() -2.5) // Start at the circle's y position
-                    .attr("x2", d => xScale(d[attribute])) // End at the same x position (vertical line)
+                    .duration(1000) 
+                    .attr("y1", d => yScale(d.film) + yScale.bandwidth() -2.5) 
+                    .attr("x2", d => xScale(d[attribute]))
                     .attr("y2", d => yScale(d.film) + yScale.bandwidth() -2.5)    
                 
                     
@@ -454,7 +454,7 @@
                         .call(d3.axisLeft(yScale));
 
                     // Update the positions of the circles
-                    svg.selectAll("circle")
+                    svg.selectAll("circle.point")
                         .transition()
                         .duration(1000) // Smooth transition
                         .attr("cy", d => yScale(d['film']) + yScale.bandwidth() - 2.5);
@@ -462,9 +462,8 @@
 
                     svg.selectAll("line")
                         .transition()
-                        .duration(1000) // Smooth transition
-                        .attr("y1", d => yScale(d.film) + yScale.bandwidth() -2.5) // Start at the circle's y position
-                        // End at the same x position (vertical line)
+                        .duration(1000) 
+                        .attr("y1", d => yScale(d.film) + yScale.bandwidth() -2.5)
                         .attr("y2", d => yScale(d.film) + yScale.bandwidth() -2.5)
 
                     svg.append("g")
